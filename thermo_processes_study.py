@@ -15,7 +15,44 @@ IDEAL_GAS_CONSTANT = 0.0821
 
 
 
-def generate_variable_values():
+def generate_values():
+    momotonic_or_diatomic = random.randint(0,1) # 0 for monatomic, 1 for diatomic
+    if momotonic_or_diatomic == 0:
+        # Monatomic gas
+        specific_heat_volume = 3/2 * IDEAL_GAS_CONSTANT
+        specific_heat_pressure = 5/2 * IDEAL_GAS_CONSTANT
+    elif momotonic_or_diatomic == 1:
+        # Diatomic gas
+        specific_heat_volume = 5/2 * IDEAL_GAS_CONSTANT
+        specific_heat_pressure = 7/2 * IDEAL_GAS_CONSTANT
+
+    heat_capacity_ratio = specific_heat_pressure / specific_heat_volume
+
+    first_state_pressure = random.randint(100000,500000)
+    first_state_volume = round(random.uniform(0.001,0.999), 3)
+
+    first_value_total = (first_state_pressure) * ((first_state_volume) ** heat_capacity_ratio)
+    second_state_pressure = random.randint(100000,500000)
+    second_state_volume_with_heat_capacity_ratio = first_value_total / second_state_pressure
+    second_state_volume = second_state_volume_with_heat_capacity_ratio ** (1/heat_capacity_ratio)
+
+    print(heat_capacity_ratio)
+    print(first_state_pressure)
+    print(first_state_volume)
+    print(second_state_pressure)
+    print(second_state_volume)
+
+
+
+
+
+    adiabatic_or_isothermal = random.randint(0,1) # 0 for adiabatic, 1 for isothermal
+    # if adiabatic_or_isothermal == 0:
+
+
+
+
+def reveiling_variable_values():
     values = [0,0,0,0,0,0,0,0,0]
     elem1 = random.randint(0,8)
     elem2 = random.randint(0,8)
@@ -96,7 +133,8 @@ def generate_variable_values():
     
 
 # Call the function to display the canvas
-generate_variable_values()
+generate_values()
+reveiling_variable_values()
 
 
     
