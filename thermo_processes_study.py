@@ -12,10 +12,36 @@ from graphics import Canvas
 
 NUMBER_OF_MOLECULES = 6.314
 IDEAL_GAS_CONSTANT = 0.0821
+def main():
+    reveiling_variable_values()
+    adiabatic_or_isothermal = random.randint(0,1) # 0 for adiabatic, 1 for isothermal
+    if adiabatic_or_isothermal == 0:
+        generate_values_adiabatic()
+    elif adiabatic_or_isothermal == 1:
+        generate_values_isothermal()
+    if second_state_pressure > first_state_pressure:
+        correct_values = {a_pressure:first_state_pressure, 
+            a_volume:first_state_volume, 
+            a_temperature: first_state_pressure * first_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT),
+            b_pressure:second_state_pressure,
+            b_volume:second_state_volume,
+            b_temperature: second_state_pressure * second_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT)}
+    elif second_state_pressure < first_state_pressure:
+        correct_values = {a_pressure:second_state_pressure, 
+            a_volume:second_state_volume, 
+            a_temperature: second_state_pressure * second_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT),
+            b_pressure:first_state_pressure,
+            b_volume:first_state_volume,
+            b_temperature: first_state_pressure * first_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT)}
+    canvas.mainloop()
+    generate_c_values(correct_values)
+
+#def generate_c_values(correct_values):
+    #if correct_values[a_volume] > correct_values[b_volume]:
+        
 
 
-
-def generate_values():
+def generate_values_adiabatic():
     momotonic_or_diatomic = random.randint(0,1) # 0 for monatomic, 1 for diatomic
     if momotonic_or_diatomic == 0:
         # Monatomic gas
@@ -36,20 +62,22 @@ def generate_values():
     second_state_volume_with_heat_capacity_ratio = first_value_total / second_state_pressure
     second_state_volume = second_state_volume_with_heat_capacity_ratio ** (1/heat_capacity_ratio)
 
-    print(heat_capacity_ratio)
-    print(first_state_pressure)
-    print(first_state_volume)
-    print(second_state_pressure)
+    return first_state_pressure, first_state_volume, second_state_pressure, second_state_volume
+
+
+
+def generate_values_isothermal():
+    first_state_pressure = random.randint(100000,500000)
+    first_state_volume = round(random.uniform(0.001,0.999), 3)
+
+    second_state_pressure = random.randint(100000,500000)
+    second_state_volume = (first_state_pressure * first_state_volume) / second_state_pressure
+
+    print(f"The first state's pressure is {first_state_pressure} Pa")
+    print(f"The first state's volume is {first_state_volume} m^3")
+    print(f"The second state's pressure is {second_state_pressure} Pa")
     print(second_state_volume)
-
-
-
-
-
-    adiabatic_or_isothermal = random.randint(0,1) # 0 for adiabatic, 1 for isothermal
-    # if adiabatic_or_isothermal == 0:
-
-
+    return first_state_pressure, first_state_volume, second_state_pressure, second_state_volume
 
 
 def reveiling_variable_values():
@@ -122,7 +150,7 @@ def reveiling_variable_values():
     
     
     canvas.mainloop()
-    #the canvas.mainloop function wasn't working properly when in the main function, so I wasn't able to create multiple functions like normal and made my flow a bit different than normal
+    #the canvas.mainloop function wasn't working properly when in the main function, so my control might look a little weird
     
 
 
@@ -133,9 +161,11 @@ def reveiling_variable_values():
     
 
 # Call the function to display the canvas
-generate_values()
-reveiling_variable_values()
+
+
 
 
     
 
+if __name__ == "__main__":
+        main()
