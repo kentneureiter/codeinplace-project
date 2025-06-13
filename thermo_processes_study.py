@@ -10,34 +10,78 @@ import math
 import random
 from graphics import Canvas
 
-NUMBER_OF_MOLECULES = 6.314
-IDEAL_GAS_CONSTANT = 0.0821
+
+NUMBER_OF_MOLECULES = round(random.uniform(0.1,20.0), 2)
+IDEAL_GAS_CONSTANT = 8.314
 def main():
-    reveiling_variable_values()
+    print("Welcome to the Heat Engine Thermodynamic Processes Study!")
+    print(f" The number of molecules is {NUMBER_OF_MOLECULES}")
     adiabatic_or_isothermal = random.randint(0,1) # 0 for adiabatic, 1 for isothermal
     if adiabatic_or_isothermal == 0:
-        generate_values_adiabatic()
+        print("This is an adiabatic process")
+        first_state_pressure, first_state_volume, second_state_pressure, second_state_volume = generate_values_adiabatic()
     elif adiabatic_or_isothermal == 1:
-        generate_values_isothermal()
+        print("This is an isothermal process")
+        first_state_pressure, first_state_volume, second_state_pressure, second_state_volume = generate_values_isothermal()
+    
     if second_state_pressure > first_state_pressure:
-        correct_values = {a_pressure:first_state_pressure, 
-            a_volume:first_state_volume, 
-            a_temperature: first_state_pressure * first_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT),
-            b_pressure:second_state_pressure,
-            b_volume:second_state_volume,
-            b_temperature: second_state_pressure * second_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT)}
+        correct_values = {"a_pressure":first_state_pressure, 
+            "a_volume":first_state_volume, 
+            "a_temperature": first_state_pressure * first_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT),
+            "b_pressure":second_state_pressure,
+            "b_volume":second_state_volume,
+            "b_temperature": second_state_pressure * second_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT)}
     elif second_state_pressure < first_state_pressure:
-        correct_values = {a_pressure:second_state_pressure, 
-            a_volume:second_state_volume, 
-            a_temperature: second_state_pressure * second_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT),
-            b_pressure:first_state_pressure,
-            b_volume:first_state_volume,
-            b_temperature: first_state_pressure * first_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT)}
-    canvas.mainloop()
+        correct_values = {"a_pressure":second_state_pressure, 
+            "a_volume":second_state_volume, 
+            "a_temperature": second_state_pressure * second_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT),
+            "b_pressure":first_state_pressure,
+            "b_volume":first_state_volume,
+            "b_temperature": first_state_pressure * first_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT)}
+    
     generate_c_values(correct_values)
+    print(correct_values)
+    convert_values_to_scale(correct_values)
+    scaled_correct_values = convert_values_to_scale(correct_values)
+    print(scaled_correct_values)
+    reveiling_variable_values(scaled_correct_values)
+    #canvas.mainloop()
 
-#def generate_c_values(correct_values):
-    #if correct_values[a_volume] > correct_values[b_volume]:
+def convert_values_to_scale(correct_values):
+    # scaling equation for pressure: (value / 1000) + 200
+    # scaling equation for volume: (value *350.7014) + 49.6492986
+    
+    scaled_correct_values = {"scaled_a_pressure":(correct_values["a_pressure"] / 1000) + 200,
+                             "scaled_a_volume":(correct_values["a_volume"] * 350.7014) + 49.6492986,
+                             "scaled_b_pressure":(correct_values["b_pressure"] / 1000) + 200,
+                             "scaled_b_volume":(correct_values["b_volume"] * 350.7014) + 49.6492986,
+                             "scaled_c_pressure":(correct_values["c_pressure"] / 1000) + 200,
+                             "scaled_c_volume":(correct_values["c_volume"] * 350.7014) + 49.6492986}
+    return scaled_correct_values
+
+
+def generate_c_values(correct_values):
+    if correct_values["a_pressure"] > correct_values["b_pressure"]:
+        up_or_down = random.randint(0,1) # 0 for up, 1 for down
+        if up_or_down == 1: 
+            correct_values["c_volume"] = correct_values["a_volume"]
+            correct_values["c_pressure"] = correct_values["b_pressure"]
+        elif up_or_down == 0:
+            correct_values["c_volume"] = correct_values["b_volume"]
+            correct_values["c_pressure"] = correct_values["b_pressure"]
+            correct_values["b_pressure"] = correct_values["a_pressure"]
+    elif correct_values["a_pressure"] < correct_values["b_pressure"]:
+        up_or_down = random.randint(0,1)
+        if up_or_down == 1:
+            correct_values["c_pressure"] = correct_values["a_pressure"]
+            correct_values["c_volume"] = correct_values["b_volume"]
+        elif up_or_down == 0:    
+            correct_values["c_pressure"] = correct_values["b_pressure"]
+            correct_values["c_volume"] = correct_values["b_volume"]
+            correct_values["b_pressure"] = correct_values["a_pressure"]
+    return correct_values
+
+            
         
 
 
@@ -55,7 +99,7 @@ def generate_values_adiabatic():
     heat_capacity_ratio = specific_heat_pressure / specific_heat_volume
 
     first_state_pressure = random.randint(100000,500000)
-    first_state_volume = round(random.uniform(0.001,0.999), 3)
+    first_state_volume = round(random.uniform(0.001,0.999), 2)
 
     first_value_total = (first_state_pressure) * ((first_state_volume) ** heat_capacity_ratio)
     second_state_pressure = random.randint(100000,500000)
@@ -68,19 +112,15 @@ def generate_values_adiabatic():
 
 def generate_values_isothermal():
     first_state_pressure = random.randint(100000,500000)
-    first_state_volume = round(random.uniform(0.001,0.999), 3)
+    first_state_volume = round(random.uniform(0.001,0.999), 2)
 
     second_state_pressure = random.randint(100000,500000)
     second_state_volume = (first_state_pressure * first_state_volume) / second_state_pressure
 
-    print(f"The first state's pressure is {first_state_pressure} Pa")
-    print(f"The first state's volume is {first_state_volume} m^3")
-    print(f"The second state's pressure is {second_state_pressure} Pa")
-    print(second_state_volume)
     return first_state_pressure, first_state_volume, second_state_pressure, second_state_volume
 
 
-def reveiling_variable_values():
+def reveiling_variable_values(scaled_correct_values):
     values = [0,0,0,0,0,0,0,0,0]
     elem1 = random.randint(0,8)
     elem2 = random.randint(0,8)
@@ -117,7 +157,7 @@ def reveiling_variable_values():
 
 
     # creating the table to display the values we just generated
-    canvas = Canvas(800, 600, title="Thermodynamic Processes Study")
+    canvas = Canvas(800, 800, title="Thermodynamic Processes Study")
 
     canvas.set_canvas_background_fill("white")
     
@@ -148,6 +188,9 @@ def reveiling_variable_values():
             y += 1
             x = 0
     
+    
+    canvas.create_rectangle(50, 300, 400, 700, fill="lightgray", outline="black")
+    canvas.create_line(scaled_correct_values["scaled_a_volume"], scaled_correct_values["scaled_a_pressure"], scaled_correct_values["scaled_a_volume"] + 5, scaled_correct_values["scaled_a_pressure"] + 5, fill="red", width=2)
     
     canvas.mainloop()
     #the canvas.mainloop function wasn't working properly when in the main function, so my control might look a little weird
