@@ -15,7 +15,7 @@ NUMBER_OF_MOLECULES = round(random.uniform(0.1,20.0), 2)
 IDEAL_GAS_CONSTANT = 8.314
 def main():
     print("Welcome to the Heat Engine Thermodynamic Processes Study!")
-    print(f" The number of molecules is {NUMBER_OF_MOLECULES}")
+    print(f"The number of molecules is {NUMBER_OF_MOLECULES}")
     adiabatic_or_isothermal = random.randint(0,1) # 0 for adiabatic, 1 for isothermal
     if adiabatic_or_isothermal == 0:
         print("This is an adiabatic process")
@@ -23,15 +23,15 @@ def main():
     elif adiabatic_or_isothermal == 1:
         print("This is an isothermal process")
         first_state_pressure, first_state_volume, second_state_pressure, second_state_volume = generate_values_isothermal()
-    
-    if second_state_pressure > first_state_pressure:
+    print (first_state_pressure, second_state_pressure)
+    if second_state_volume > first_state_volume:
         correct_values = {"a_pressure":first_state_pressure, 
             "a_volume":first_state_volume, 
             "a_temperature": first_state_pressure * first_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT),
             "b_pressure":second_state_pressure,
             "b_volume":second_state_volume,
             "b_temperature": second_state_pressure * second_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT)}
-    elif second_state_pressure < first_state_pressure:
+    elif second_state_volume < first_state_volume:
         correct_values = {"a_pressure":second_state_pressure, 
             "a_volume":second_state_volume, 
             "a_temperature": second_state_pressure * second_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT),
@@ -39,25 +39,65 @@ def main():
             "b_volume":first_state_volume,
             "b_temperature": first_state_pressure * first_state_volume / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT)}
     
-    generate_c_values(correct_values)
+    
+   
+    correct_values, up_or_down = generate_c_values(correct_values)
     print(correct_values)
-    convert_values_to_scale(correct_values)
-    scaled_correct_values = convert_values_to_scale(correct_values)
+
+   
+    scaled_correct_values = convert_values_to_graph_values(correct_values, up_or_down)
     print(scaled_correct_values)
     reveiling_variable_values(scaled_correct_values)
     #canvas.mainloop()
+    
 
-def convert_values_to_scale(correct_values):
+
+
+
+
+def convert_values_to_graph_values(correct_values, up_or_down):
     # scaling equation for pressure: (value / 1000) + 200
     # scaling equation for volume: (value *350.7014) + 49.6492986
-    
-    scaled_correct_values = {"scaled_a_pressure":(correct_values["a_pressure"] / 1000) + 200,
-                             "scaled_a_volume":(correct_values["a_volume"] * 350.7014) + 49.6492986,
-                             "scaled_b_pressure":(correct_values["b_pressure"] / 1000) + 200,
-                             "scaled_b_volume":(correct_values["b_volume"] * 350.7014) + 49.6492986,
-                             "scaled_c_pressure":(correct_values["c_pressure"] / 1000) + 200,
-                             "scaled_c_volume":(correct_values["c_volume"] * 350.7014) + 49.6492986}
+    scaled_correct_values = {}
+    if correct_values["a_pressure"] == correct_values["b_pressure"]:
+        scaled_correct_values["graph_a_pressure"] = 400
+        scaled_correct_values["graph_a_volume"] = 137.5
+        if up_or_down == 1:
+            scaled_correct_values["graph_b_pressure"] = 600
+            scaled_correct_values["graph_b_volume"] = 312.5
+            scaled_correct_values["graph_c_pressure"] = 600
+            scaled_correct_values["graph_c_volume"] = 137.5
+        elif up_or_down == 0:
+            scaled_correct_values["graph_b_pressure"] = 400
+            scaled_correct_values["graph_b_volume"] = 312.5
+            scaled_correct_values["graph_c_pressure"] = 600
+            scaled_correct_values["graph_c_volume"] = 312.5
+    else: 
+    #correct_values["a_pressure"] < correct_values["b_pressure"]:
+        scaled_correct_values["graph_a_pressure"] = 600
+        scaled_correct_values["graph_a_volume"] = 137.5
+        if up_or_down == 1:
+            scaled_correct_values["graph_b_pressure"] = 400
+            scaled_correct_values["graph_b_volume"] = 312.5
+            scaled_correct_values["graph_c_pressure"] = 600
+            scaled_correct_values["graph_c_volume"] = 312.5
+        elif up_or_down == 0:
+            scaled_correct_values["graph_b_pressure"] = 400
+            scaled_correct_values["graph_b_volume"] = 137.5
+            scaled_correct_values["graph_c_pressure"] = 400
+            scaled_correct_values["graph_c_volume"] = 312.5
+        
     return scaled_correct_values
+"""
+    scaled_correct_values = {"graph_a_pressure":800 - (correct_values["a_pressure"] / 1000),
+                             "graph_a_volume":(correct_values["a_volume"] * 350.7014) + 49.6492986,
+                             "graph_b_pressure":800 - (correct_values["b_pressure"] / 1000),
+                             "graph_b_volume":(correct_values["b_volume"] * 350.7014) + 49.6492986,
+                             "graph_c_pressure":800 - (correct_values["c_pressure"] / 1000),
+                             "graph_c_volume":(correct_values["c_volume"] * 350.7014) + 49.6492986
+                             }
+"""
+    
 
 
 def generate_c_values(correct_values):
@@ -66,11 +106,13 @@ def generate_c_values(correct_values):
         if up_or_down == 1: 
             correct_values["c_volume"] = correct_values["a_volume"]
             correct_values["c_pressure"] = correct_values["b_pressure"]
+
         elif up_or_down == 0:
             correct_values["c_volume"] = correct_values["b_volume"]
             correct_values["c_pressure"] = correct_values["b_pressure"]
             correct_values["b_pressure"] = correct_values["a_pressure"]
     elif correct_values["a_pressure"] < correct_values["b_pressure"]:
+        print("b pressure is greater than a pressure")
         up_or_down = random.randint(0,1)
         if up_or_down == 1:
             correct_values["c_pressure"] = correct_values["a_pressure"]
@@ -78,8 +120,8 @@ def generate_c_values(correct_values):
         elif up_or_down == 0:    
             correct_values["c_pressure"] = correct_values["b_pressure"]
             correct_values["c_volume"] = correct_values["b_volume"]
-            correct_values["b_pressure"] = correct_values["a_pressure"]
-    return correct_values
+            correct_values["b_volume"] = correct_values["a_volume"]
+    return correct_values, up_or_down
 
             
         
@@ -190,7 +232,18 @@ def reveiling_variable_values(scaled_correct_values):
     
     
     canvas.create_rectangle(50, 300, 400, 700, fill="lightgray", outline="black")
-    canvas.create_line(scaled_correct_values["scaled_a_volume"], scaled_correct_values["scaled_a_pressure"], scaled_correct_values["scaled_a_volume"] + 5, scaled_correct_values["scaled_a_pressure"] + 5, fill="red", width=2)
+    canvas.create_oval(scaled_correct_values["graph_a_volume"] - 3, scaled_correct_values["graph_a_pressure"] -3, scaled_correct_values["graph_a_volume"] + 3, scaled_correct_values["graph_a_pressure"] + 3, fill="red", outline="black")
+    canvas.create_text(scaled_correct_values["graph_a_volume"] - 20, scaled_correct_values["graph_a_pressure"] - 20, text = "a", font = "Arial 12")
+    canvas.create_oval(scaled_correct_values["graph_b_volume"] - 3, scaled_correct_values["graph_b_pressure"] -3, scaled_correct_values["graph_b_volume"] + 3, scaled_correct_values["graph_b_pressure"] + 3, fill="red", outline="black")
+    canvas.create_text(scaled_correct_values["graph_b_volume"] - 20, scaled_correct_values["graph_b_pressure"] - 20, text = "b", font = "Arial 12")
+    canvas.create_oval(scaled_correct_values["graph_c_volume"] - 3, scaled_correct_values["graph_c_pressure"] -3, scaled_correct_values["graph_c_volume"] + 3, scaled_correct_values["graph_c_pressure"] + 3, fill="red", outline="black")
+    canvas.create_text(scaled_correct_values["graph_c_volume"] - 20, scaled_correct_values["graph_c_pressure"] - 20, text = "c", font = "Arial 12")
+
+    #creating the lines between points
+    canvas.create_line(scaled_correct_values["graph_a_volume"], scaled_correct_values["graph_a_pressure"], scaled_correct_values["graph_b_volume"], scaled_correct_values["graph_b_pressure"], fill="black")
+    canvas.create_line(scaled_correct_values["graph_b_volume"], scaled_correct_values["graph_b_pressure"], scaled_correct_values["graph_c_volume"], scaled_correct_values["graph_c_pressure"], fill="black")
+    canvas.create_line(scaled_correct_values["graph_c_volume"], scaled_correct_values["graph_c_pressure"], scaled_correct_values["graph_a_volume"], scaled_correct_values["graph_a_pressure"], fill="black")
+
     
     canvas.mainloop()
     #the canvas.mainloop function wasn't working properly when in the main function, so my control might look a little weird
@@ -206,7 +259,9 @@ def reveiling_variable_values(scaled_correct_values):
 # Call the function to display the canvas
 
 
-
+#note: scaling for volume isn't working perfectly
+#note: I am trying to fix the bug where I am unable to generate graphs where point a is greater than point b for pressure. So I commented
+#out portions of the main function which you might want to look over again later to see if that was the issue or not.
 
     
 
