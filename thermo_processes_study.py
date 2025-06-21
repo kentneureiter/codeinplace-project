@@ -11,7 +11,7 @@ import random
 from graphics import Canvas
 
 
-NUMBER_OF_MOLECULES = round(random.uniform(0.1,20.0), 2)
+NUMBER_OF_MOLECULES = round(random.uniform(0.1,20.0), 1)
 IDEAL_GAS_CONSTANT = 8.314
 def main():
     print("Welcome to the Heat Engine Thermodynamic Processes Study!")
@@ -41,13 +41,12 @@ def main():
     
     
    
-    correct_values, up_or_down = generate_c_values(correct_values)
+    generate_c_values(correct_values)
     print(correct_values)
 
-   
-    scaled_correct_values = convert_values_to_graph_values(correct_values, up_or_down)
+    scaled_correct_values = convert_values_to_graph_values(correct_values)
     print(scaled_correct_values)
-    reveiling_variable_values(scaled_correct_values)
+    reveiling_variable_values(correct_values, scaled_correct_values)
     #canvas.mainloop()
     
 
@@ -55,38 +54,43 @@ def main():
 
 
 
-def convert_values_to_graph_values(correct_values, up_or_down):
+def convert_values_to_graph_values(correct_values):
     # scaling equation for pressure: (value / 1000) + 200
     # scaling equation for volume: (value *350.7014) + 49.6492986
     scaled_correct_values = {}
     if correct_values["a_pressure"] == correct_values["b_pressure"]:
         scaled_correct_values["graph_a_pressure"] = 400
         scaled_correct_values["graph_a_volume"] = 137.5
-        if up_or_down == 1:
-            scaled_correct_values["graph_b_pressure"] = 600
-            scaled_correct_values["graph_b_volume"] = 312.5
-            scaled_correct_values["graph_c_pressure"] = 600
-            scaled_correct_values["graph_c_volume"] = 137.5
-        elif up_or_down == 0:
-            scaled_correct_values["graph_b_pressure"] = 400
-            scaled_correct_values["graph_b_volume"] = 312.5
-            scaled_correct_values["graph_c_pressure"] = 600
-            scaled_correct_values["graph_c_volume"] = 312.5
-    else: 
-    #correct_values["a_pressure"] < correct_values["b_pressure"]:
+        scaled_correct_values["graph_b_pressure"] = 400
+        scaled_correct_values["graph_b_volume"] = 312.5
+        scaled_correct_values["graph_c_pressure"] = 600
+        scaled_correct_values["graph_c_volume"] = 312.5
+    elif correct_values["a_volume"] == correct_values["c_volume"]:
+        scaled_correct_values["graph_a_pressure"] = 400
+        scaled_correct_values["graph_a_volume"] = 137.5
+        scaled_correct_values["graph_b_pressure"] = 600
+        scaled_correct_values["graph_b_volume"] = 312.5
+        scaled_correct_values["graph_c_pressure"] = 600
+        scaled_correct_values["graph_c_volume"] = 137.5
+    elif correct_values["a_pressure"] == correct_values["c_pressure"]:
         scaled_correct_values["graph_a_pressure"] = 600
         scaled_correct_values["graph_a_volume"] = 137.5
-        if up_or_down == 1:
-            scaled_correct_values["graph_b_pressure"] = 400
-            scaled_correct_values["graph_b_volume"] = 312.5
-            scaled_correct_values["graph_c_pressure"] = 600
-            scaled_correct_values["graph_c_volume"] = 312.5
-        elif up_or_down == 0:
-            scaled_correct_values["graph_b_pressure"] = 400
-            scaled_correct_values["graph_b_volume"] = 137.5
-            scaled_correct_values["graph_c_pressure"] = 400
-            scaled_correct_values["graph_c_volume"] = 312.5
-        
+        scaled_correct_values["graph_b_pressure"] = 400
+        scaled_correct_values["graph_b_volume"] = 312.5
+        scaled_correct_values["graph_c_pressure"] = 600
+        scaled_correct_values["graph_c_volume"] = 312.5
+    else:
+        scaled_correct_values["graph_a_pressure"] = 600
+        scaled_correct_values["graph_a_volume"] = 137.5
+        scaled_correct_values["graph_b_pressure"] = 400
+        scaled_correct_values["graph_b_volume"] = 137.5
+        scaled_correct_values["graph_c_pressure"] = 400
+        scaled_correct_values["graph_c_volume"] = 312.5
+    
+
+    #if correct_values["a_pressure"] > correct_values["b_pressure"] or correct_values["a_pressure"] > correct_values["c_pressure"]:
+
+
     return scaled_correct_values
 """
     scaled_correct_values = {"graph_a_pressure":800 - (correct_values["a_pressure"] / 1000),
@@ -121,7 +125,8 @@ def generate_c_values(correct_values):
             correct_values["c_pressure"] = correct_values["b_pressure"]
             correct_values["c_volume"] = correct_values["b_volume"]
             correct_values["b_volume"] = correct_values["a_volume"]
-    return correct_values, up_or_down
+    correct_values["c_temperature"] = correct_values["c_pressure"] * correct_values["c_volume"] / (NUMBER_OF_MOLECULES * IDEAL_GAS_CONSTANT)
+    return correct_values
 
             
         
@@ -140,11 +145,11 @@ def generate_values_adiabatic():
 
     heat_capacity_ratio = specific_heat_pressure / specific_heat_volume
 
-    first_state_pressure = random.randint(100000,500000)
+    first_state_pressure = (random.randint(100,500)) * 1000
     first_state_volume = round(random.uniform(0.001,0.999), 2)
 
     first_value_total = (first_state_pressure) * ((first_state_volume) ** heat_capacity_ratio)
-    second_state_pressure = random.randint(100000,500000)
+    second_state_pressure = (random.randint(100,500)) * 1000
     second_state_volume_with_heat_capacity_ratio = first_value_total / second_state_pressure
     second_state_volume = second_state_volume_with_heat_capacity_ratio ** (1/heat_capacity_ratio)
 
@@ -153,16 +158,16 @@ def generate_values_adiabatic():
 
 
 def generate_values_isothermal():
-    first_state_pressure = random.randint(100000,500000)
+    first_state_pressure = (random.randint(100,500)) * 1000
     first_state_volume = round(random.uniform(0.001,0.999), 2)
 
-    second_state_pressure = random.randint(100000,500000)
+    second_state_pressure = (random.randint(100,500)) * 1000
     second_state_volume = (first_state_pressure * first_state_volume) / second_state_pressure
 
     return first_state_pressure, first_state_volume, second_state_pressure, second_state_volume
 
 
-def reveiling_variable_values(scaled_correct_values):
+def reveiling_variable_values(correct_values, scaled_correct_values):
     values = [0,0,0,0,0,0,0,0,0]
     elem1 = random.randint(0,8)
     elem2 = random.randint(0,8)
@@ -175,8 +180,22 @@ def reveiling_variable_values(scaled_correct_values):
     print(f"{elem1}")
     print(f"{elem2}")
     print(f"{elem3}") 
+    
+    #converting correct_values dictionary values to a list to retrieve easily
+
+    listed_correct_values = [correct_values["a_pressure"], correct_values["a_volume"], correct_values["a_temperature"],
+                            correct_values["b_pressure"], correct_values["b_volume"], correct_values["b_temperature"],
+                            correct_values["c_pressure"], correct_values["c_volume"], correct_values["c_temperature"]]
+    
     #generating value for elem1 based off what column it is in
-    if elem1 == 0 or elem1 ==3 or elem1 == 6:
+    
+    
+    values[elem1] = listed_correct_values[elem1]
+    values[elem2] = listed_correct_values[elem2]
+    values[elem3] = listed_correct_values[elem3]
+    
+   
+    """if elem1 == 0 or elem1 ==3 or elem1 == 6:
         values[elem1] = random.randint(100000,500000)
     elif elem1 == 1 or elem1 == 4 or elem1 == 7:
         values[elem1] = round(random.uniform(0.001,0.999), 3)
@@ -196,7 +215,7 @@ def reveiling_variable_values(scaled_correct_values):
         values[elem3] = round(random.uniform(0.001,0.999), 3)
     elif elem3 == 2 or elem3 == 5 or elem3 == 8:
         values[elem3] = random.randint(100,500)
-
+"""
 
     # creating the table to display the values we just generated
     canvas = Canvas(800, 800, title="Thermodynamic Processes Study")
